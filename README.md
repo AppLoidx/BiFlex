@@ -6,3 +6,7 @@
 
 In development 😛
 
+
+## ♂ Developers ♂
+
+![](https://i.imgur.com/ix6EDJl.jpg)
