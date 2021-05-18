@@ -64,12 +64,12 @@ stmt: FOR iterator DO stmt { $$ = newast('F', $2, $4); }
 	| NAME exp { yyerror("':=' expected"); }
 ;
 
-iterator:  { yyerror("iterator missed"); }
+iterator:  { yyerror("for iterator missed"); }
 	| NAME ASSIGN exp TO exp { $$ = newast('I', newref($1), newast('E', $3, $5)); }
 	| ASSIGN { yyerror("variable missed"); }
 	| NAME exp { yyerror("':=' expected"); }
-	| NAME ASSIGN TO { yyerror("iterator begin value missed"); }
-	| NAME ASSIGN exp TO { yyerror("iterator end value missed"); }
+	| NAME ASSIGN TO { yyerror("for begin value missed"); }
+	| NAME ASSIGN exp TO { yyerror("for end value missed"); }
 ;
 
 exp: exp CMP exp	{ $$ = newcmp($2, $1, $3); }

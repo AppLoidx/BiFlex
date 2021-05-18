@@ -1,0 +1,4 @@
+Var a, b: Decimal;
+Begin
+    FOR a := {empty} TO 3 DO b := a;
+End

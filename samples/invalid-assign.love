@@ -1,0 +1,7 @@
+{
+    produces lexer error
+}
+Var demon: Boolean;
+Begin
+    demon = 666; 
+End

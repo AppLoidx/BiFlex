@@ -1,0 +1,4 @@
+Var a: Boolean;
+Begin
+    b := 0;
+End
