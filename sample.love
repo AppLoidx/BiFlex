@@ -1,0 +1,13 @@
+Var a, b: Decimal;
+Var d: Boolean;
+Var c: Decimal;
+
+Begin
+    a := 3 + 6 / 3;
+    FOR b := 0 TO 5 DO a := a + b;
+    {
+        my
+        comments
+    }
+    d := .NOT. (a > b);
+End
