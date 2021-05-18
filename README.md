@@ -4,7 +4,11 @@
 </h1>
 
 
-In development 😛
+## Run 🏃‍♀️
+```
+make
+./biflex sample.love
+```
 
 
 ## ♂ Developers ♂
