@@ -4,10 +4,9 @@ Var c: Decimal;
 
 Begin
     a := 3 + 6 / 3;
-    FOR b := 0 TO 5 DO a := a + b;
+    FOR b := 0 TO 3 DO a := a + b;
     {
-        my
-        comments
+        Love will save the world 💖
     }
     d := .NOT. (a > b);
 End
