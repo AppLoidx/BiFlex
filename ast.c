@@ -5,6 +5,8 @@
 #  include <math.h>
 #  include "ast.h"
 
+struct symbol symtable__[NHASH];
+
 /**
  * Utility hashing func for character
  */
@@ -22,7 +24,7 @@ static unsigned symhash(char *sym) {
  * 
  * */
 struct symbol *lookup(char *sym, int is_delcaring) {
-    struct symbol *sp = &symtab[symhash(sym) % NHASH];
+    struct symbol *sp = &symtable__[symhash(sym) % NHASH];
     int scount = NHASH;        /* how many have we looked at */
 
     while (--scount >= 0) {
@@ -39,7 +41,7 @@ struct symbol *lookup(char *sym, int is_delcaring) {
             } else yyerror("non declared var '%s'", sym);
         }
 
-        if (++sp >= symtab + NHASH) sp = symtab; /* try the next entry */
+        if (++sp >= symtable__ + NHASH) sp = symtable__; /* try the next entry */
     }
     yyerror("symbol table overflow\n");
 }
