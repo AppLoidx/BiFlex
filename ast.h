@@ -10,7 +10,7 @@ struct symbol {
 /* size of symtab*/
 
 #define NHASH 9997
-struct symbol symtab[NHASH];
+//struct symbol symtable__[NHASH];
 
 struct symbol *lookup(char*, int);
 
