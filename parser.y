@@ -29,6 +29,7 @@
 %%
 prog: declars BN list ED { struct ast *prog = newast('P', newast('L', $1, NULL), newast('L', $3, NULL));
 			dumpast(prog, 0, NULL);
+			toAst(prog);
 			treefree(prog);
 		}
 ;

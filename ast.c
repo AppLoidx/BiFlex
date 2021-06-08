@@ -445,3 +445,234 @@ int dumpast(struct ast *a, int offset, const char *description) {
 
     return branchesHeight;
 }
+
+static void printByNodetypeSym(struct ast *a) {
+    switch (a->nodetype)
+    {
+    case '+':
+        fprintf(stderr, " + ");
+        break;
+    case '-':
+        fprintf(stderr, " - ");
+        break;
+    case '*':
+        fprintf(stderr, " * ");
+        break;
+    case '/':
+        fprintf(stderr, " / ");
+        break;
+    case '&':
+        fprintf(stderr, " & ");
+        break;
+    case '|':
+        fprintf(stderr, " | ");
+        break;
+    case '^':
+        fprintf(stderr, " ^ ");
+        break;
+    }
+}
+
+
+int labelCounter = 0;
+int tempCounter = 0;
+int haveTempVar = 0;
+
+void toAst(struct ast *a) {
+    
+    switch (a->nodetype) {
+        case 'P': {
+            toAst(a->l);
+            toAst(a->r);
+            break;
+        }
+        case 'L': {
+            toAst(a->l);
+            if (a->r == NULL) break;
+            toAst(a->r);
+            break;
+        }
+        case 'B': {
+            struct symlist *sl = ((struct declaration *) a)->symlist;
+            do {
+                fprintf(stderr, "%s = 0\n", sl->sym->name);
+            } while (sl = sl->next);
+            break;
+        }
+        case 'D': {
+            struct symlist *sl = ((struct declaration *) a)->symlist;
+            do {
+                fprintf(stderr, "%s = 0\n", sl->sym->name);
+            } while (sl = sl->next);
+            break;
+        }
+        case '=': {
+            struct symasgn * sagn = ((struct symasgn *) a);
+            if (sagn->v->r != NULL)
+            switch (sagn->v->r->nodetype)
+            {
+                case '+':
+                case '-':
+                case '*':
+                case '/':
+                case '&':
+                case '|':
+                case '^':
+                    toAst(sagn->v); // exp
+                    toAst(sagn->s); // var
+                    fprintf(stderr, " = temp%d", tempCounter);
+                    fputs("\n", stderr);
+                    break;
+                default:
+                    toAst(sagn->s); // var
+                    fprintf(stderr, " = ");
+                    toAst(sagn->v); // exp
+                    fprintf(stderr, "\n");
+                    break;
+
+            }
+            else {
+                toAst(sagn->s); // var
+                fprintf(stderr, " = ");
+                toAst(sagn->v); // exp
+                fprintf(stderr, "\n");
+            }
+
+            break;
+        }
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '&':
+        case '|':
+        case '^': {
+            switch (a->r->nodetype)
+            {
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+            case '&':
+            case '|':
+            case '^':
+                tempCounter++;
+                fprintf(stderr, "tmp%d = ", tempCounter);
+                toAst(a->r);
+                fputs("\n", stderr);
+                haveTempVar = 1;
+
+                
+                tempCounter++;
+                fprintf(stderr, "tmp%d = ", tempCounter);
+                toAst(a->l);
+                printByNodetypeSym(a);
+                fprintf(stderr, "tmp%d", tempCounter - 1);
+                fputs("\n", stderr);
+
+                break;
+            default:
+                
+                toAst(a->l);
+
+                printByNodetypeSym(a);
+
+                if (haveTempVar) {
+                    fprintf(stderr, "temp%d", tempCounter);
+                } else {
+                    toAst(a->r);
+                    haveTempVar = 0;
+                    
+                }
+                break;
+            }
+
+
+
+            
+            break;
+        }
+        case '!': {
+            fprintf(stderr, "!(");
+            toAst(a->l);
+            fprintf(stderr, ")");
+
+            break;
+        }
+            /* comparisons */
+        case '1': {
+            toAst(a->l);
+            fprintf(stderr, ">");
+            toAst(a->r);
+            break;
+        }
+        case '2': {
+            toAst(a->l);
+            fprintf(stderr, "<");
+            toAst(a->r);
+            break;
+        }
+        case '3': {
+            toAst(a->l);
+            fprintf(stderr, "==");
+            toAst(a->r);
+            break;
+        }
+        case 'K': {
+            fprintf(stderr, "%d", ((struct numval *) a)->number);
+            break;
+        }
+        case 'N': {
+            fprintf(stderr, "%s", ((struct symref *) a)->s->name);
+            break;
+        }
+        case 'F': {
+            int labelNum = labelCounter++;
+            fprintf(stderr, "label_%d:\n", labelNum);
+            toAst(a->l->l);    // iter
+            fprintf(stderr, " = ");
+            toAst(a->l->r->l);
+            fprintf(stderr, "\n");
+            toAst(a->r);   // stmt
+            toAst(a->l->l);    // iter
+
+            fprintf(stderr, " = ");
+            toAst(a->l->l);    // iter
+            fprintf(stderr, " + 1 \n");
+
+            tempCounter++;
+            fprintf(stderr, "tmp%d = ", tempCounter);
+            toAst(a->l->l);    // iter
+            fprintf(stderr, " == ");
+            toAst(a->l->r->r);
+            fputs("\n", stderr);
+            
+            fprintf(stderr, "jump ");
+
+            
+            fprintf(stderr, "temp%d label_%d\n", tempCounter, labelNum);
+            break;
+        }
+        case 'I': {
+            fprintf(stderr, "for ");
+            toAst(a->l);
+            fprintf(stderr, " ");
+            toAst(a->r);
+
+            break;
+        }
+        case 'E': {
+            fprintf(stderr, " from ");
+            toAst(a->l);
+            fprintf(stderr, " to");
+            toAst(a->r);
+
+            break;
+        }
+
+        default:
+            printf("dead inside: shit node %c\n", a->nodetype);
+    }
+
+}
+

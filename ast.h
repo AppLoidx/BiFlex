@@ -86,5 +86,6 @@ int yylex();
 int yyparse();
 
 int dumpast(struct ast * a, int level, const char * description);
+void toAst(struct ast * a);
 
 #endif
